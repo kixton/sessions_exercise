@@ -9,6 +9,7 @@ module Sessions
     end
 
     get '/' do
+      # session treated like a hash
       if session[:user_id]
         erb :index
       else
@@ -16,6 +17,7 @@ module Sessions
       end
     end
 
+    
     get '/signup' do
       erb :signup
     end
@@ -23,7 +25,9 @@ module Sessions
     post '/users' do
       if params[:password] == params[:password_confirmation]
         hashed_password = User.encrypt_password(params[:password])
-        User.create(username: params[:username], password_hash: hashed_password)
+        user = User.create(username: params[:username], password_hash: hashed_password)
+        # login upon creation
+        # session[:user_id] = user.id
       end
       redirect to('/')
     end
@@ -32,6 +36,7 @@ module Sessions
       erb :login
     end
 
+    # creates a new session
     post '/sessions' do
       user = User.find_by(username: params[:username])
       if user.validate_password(params[:password])
